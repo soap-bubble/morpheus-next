@@ -22,7 +22,7 @@ import {
 
 const actionQueue = new Queue(1, 128)
 
-export default function({ dispatch, scene }) {
+export default function Pano({ dispatch, scene }) {
   const store = storeFactory()
   const handleEvent = handleEventFactory()
   const raycaster = new Raycaster()

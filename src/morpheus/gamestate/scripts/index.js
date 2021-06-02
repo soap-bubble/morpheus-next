@@ -22,7 +22,7 @@ function enabled(cast, gamestates) {
   return isCastActive({ cast, gamestates })
 }
 
-export default function(type) {
+export default function Index(type) {
   const script = scripts.find(({ id }) => id === type)
   if (script) {
     return Object.assign(

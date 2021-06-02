@@ -3,11 +3,13 @@ import {
 } from 'lodash';
 import Queue from 'promise-queue';
 
-export default function ({
-  concurrent = 3,
-  filter,
-  loader,
-} = {}) {
+export default function Loader(
+  {
+    concurrent = 3,
+    filter,
+    loader,
+  } = {}
+) {
   const toLoad = [];
   const loaded = [];
   const loadingQueue = new Queue(concurrent, Infinity);

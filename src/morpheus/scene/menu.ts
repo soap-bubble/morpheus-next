@@ -4,7 +4,7 @@ const SIZE = 256
 const OFFSET = 10
 const SCALE = 0.15
 
-export default function(casts: any[]) {
+export default function Menu(casts: any[]) {
   return [
     {
       castId: 0,

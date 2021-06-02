@@ -4,7 +4,7 @@ import useThunkDispatch from "utils/useThunkDispatch";
 import { closeSettings, fullscreen } from "../commands";
 import Settings from "../components/Settings";
 
-export default () => {
+const SettingsComponent = () => {
   const dispatch = useThunkDispatch();
   const onClose = useCallback(
     () => dispatch(closeSettings()),
@@ -16,3 +16,5 @@ export default () => {
   );
   return <Settings onClose={onClose} onFullscreen={onFullscreen} />;
 };
+
+export default SettingsComponent;

@@ -3,9 +3,11 @@ import {
 } from 'lodash';
 import createCanvas from 'utils/canvas';
 
-export default function ({
-  maxCanvases,
-} = {}) {
+export default function CanvasFactory(
+  {
+    maxCanvases,
+  } = {}
+) {
   const instances = [];
 
   const factory = function canvasFactory() {

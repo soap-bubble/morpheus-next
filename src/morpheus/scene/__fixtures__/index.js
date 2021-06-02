@@ -15,7 +15,7 @@ export const sceneData = {
   casts: [castData],
 };
 
-export default function (_data) {
+export default function Index(_data) {
   let data = merge({
     ...sceneData,
   }, _data);

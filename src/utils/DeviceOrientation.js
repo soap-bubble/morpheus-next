@@ -7,7 +7,7 @@ import THREE from 'three';
  * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
  */
 
-export default function (object) {
+export default function DeviceOrientation(object) {
   const scope = this;
 
   this.object = object;

@@ -164,7 +164,7 @@ function eventQueueReducer(
 
 const isMovieSpecialCast = forMorpheusType('MovieSpecialCast')
 
-export default function(
+export default function UseInputHandler(
   scene: Scene,
   gamestates: Gamestates,
   castEndObserver: Observable<SupportedSoundCasts> | undefined | null,

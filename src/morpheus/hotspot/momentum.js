@@ -8,7 +8,7 @@ import {
 import raf from 'raf';
 import storeFactory from '../../store';
 
-export default function ({ dispatch, scene }) {
+export default function Momentum({ dispatch, scene }) {
   const store = storeFactory();
   // Here an interaction is a user touch gesture or a pointer movement with mouse clicked
   const interaction = {

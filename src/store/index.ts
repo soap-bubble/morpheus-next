@@ -13,7 +13,7 @@ declare global {
 
 let store: Store;
 
-export default function () {
+export default function Index() {
   if (!store) {
     let middleware;
     const epicMiddleware = createEpicMiddleware();

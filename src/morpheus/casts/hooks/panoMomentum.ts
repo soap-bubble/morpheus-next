@@ -61,10 +61,7 @@ type PanoHandler = [
   PointerEvents<HTMLCanvasElement>
 ]
 
-export default function(
-  sensitivity: number,
-  interactionDebounce: number
-): PanoHandler {
+export default function PanoMomentum(sensitivity: number, interactionDebounce: number): PanoHandler {
   // Here an interaction is a user touch gesture or a pointer movement with mouse clicked
   const [rotation, setRotation] = useState({
     x: 0,
