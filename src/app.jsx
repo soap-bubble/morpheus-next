@@ -75,7 +75,6 @@ window.onload = async () => {
     window.addEventListener('resize', resizeToWindow)
     setTimeout(() => render(
       <Provider store={store}>
-        {/* <NewGame sceneData={sceneData} /> */}
         <Game className="game" />
       </Provider>,
       root,

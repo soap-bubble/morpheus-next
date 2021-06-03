@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import cn from 'classnames';
+import styles from './Title.module.css'
 
 export default class Title extends Component {
   render() {
@@ -14,7 +15,7 @@ export default class Title extends Component {
         style={{
           opacity,
         }}
-        className={cn('title')}
+        className={cn(styles.title)}
         width={width}
         height={height}
         ref={canvasCreated}

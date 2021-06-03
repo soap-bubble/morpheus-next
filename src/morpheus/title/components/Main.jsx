@@ -1,10 +1,12 @@
 import React from 'react';
 import cx from 'classnames';
-import Tween from '@tweenjs/tween.js';
+import {Tween, Easing} from '@tweenjs/tween.js';
 import { getAssetUrl } from 'service/gamedb';
 import Title from '../containers/Title';
 import PlayOverlay from './PlayOverlay';
 import WhyAmISeeingThis from './WhyAmISeeingThis';
+
+import styles from './Main.module.css'
 
 const WHY_DO_I_NEED_TO_CLICK_PLAY = 'Recent changes to Chrome require user interaction before WebAudio can be played.';
 
@@ -19,7 +21,7 @@ class Main extends React.Component {
     this.onPlayClicked = this.onPlayClicked.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.volume !== nextProps.volume && this.audio && !this.state.isLeaving) {
       this.audio.volume = nextProps.volume;
     }
@@ -50,7 +52,7 @@ class Main extends React.Component {
         .to({
           target: 0,
         })
-        .easing(Tween.Easing.Sinusoidal.Out)
+        .easing(Easing.Sinusoidal.Out)
         .onUpdate(() => {
           this.audio.volume = v.target;
           // this.setState({
@@ -72,9 +74,7 @@ class Main extends React.Component {
 
     return (
       <div
-        className={cx('main-title', {
-          'request-play': started,
-        })}
+        className={cx(styles.mainTitle)}
         style={{
           ...style,
         }}

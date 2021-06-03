@@ -1,18 +1,17 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-const PlayOverlay = ({
-  onClick,
-  children = null,
-}) => (
+import styles from "./PlayOverlay.module.css";
+
+const PlayOverlay = ({ onClick, children = null }) => (
   <div
     style={{
-      width: '100%',
-      height: '100%',
+      width: "100%",
+      height: "100%",
     }}
   >
-    <div className="play-background" />
-    <div className="play-overlay" onClick={onClick}>
+    <div className={styles.playBackground} />
+    <div className={styles.playOverlay} onClick={onClick}>
       {children}
     </div>
   </div>

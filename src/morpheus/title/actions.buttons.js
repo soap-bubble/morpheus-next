@@ -6,27 +6,21 @@ import {
   TextureLoader,
   Raycaster,
   Vector2,
-} from 'three';
-import {
-  selectors as gameSelectors,
-} from 'morpheus/game';
-import Tween from '@tweenjs/tween.js';
-import renderEvents from 'utils/render';
+} from "three";
+import { selectors as gameSelectors } from "morpheus/game";
+import { Tween, Easing } from "@tweenjs/tween.js";
+import renderEvents from "utils/render";
 
-import {
-  singleRippleVertexShader,
-} from './shaders';
-import {
-  titleDimensions,
-} from './selectors';
-const newMap = '/image/texture/new.png';
-const newBumpMap = '/image/texture/new-bump.png';
-const settingsMap = '/image/texture/settings.png';
-const settingsBumpMap = '/image/texture/settings-bump.png';
-const exitMap = '/image/texture/exit.png';
-const exitBumpMap = '/image/texture/exit-bump.png';
-const contMap = '/image/texture/cont.png';
-const contBumpMap = '/image/texture/cont-bump.png';
+import { singleRippleVertexShader } from "./shaders";
+import { titleDimensions } from "./selectors";
+const newMap = "/image/texture/new.png";
+const newBumpMap = "/image/texture/new-bump.png";
+const settingsMap = "/image/texture/settings.png";
+const settingsBumpMap = "/image/texture/settings-bump.png";
+const exitMap = "/image/texture/exit.png";
+const exitBumpMap = "/image/texture/exit-bump.png";
+const contMap = "/image/texture/cont.png";
+const contBumpMap = "/image/texture/cont-bump.png";
 
 const textureLoader = new TextureLoader();
 
@@ -36,12 +30,7 @@ function createTexture(map) {
   });
 }
 
-function createButton({
-  map,
-  bumpMap,
-  uniforms,
-  position,
-}) {
+function createButton({ map, bumpMap, uniforms, position }) {
   function createGeometry() {
     const geometry = new PlaneGeometry(1, 0.5, 1, 1);
     return geometry;
@@ -52,26 +41,30 @@ function createButton({
   }
 
   function createMaterial() {
-    const material = new MeshPhongMaterial(Object.assign({
-      map,
-      specular: 0x222222,
-      shininess: 5,
-      side: DoubleSide,
-      transparent: true,
-      vertexShader: singleRippleVertexShader,
-      uniforms,
-    }, !window.hasOwnProperty('cordova') ? {
-      bumpMap,
-      bumpScale: 0.1,
-    } : {}));
+    const material = new MeshPhongMaterial(
+      Object.assign(
+        {
+          map,
+          specular: 0x222222,
+          shininess: 5,
+          side: DoubleSide,
+          transparent: true,
+          vertexShader: singleRippleVertexShader,
+          uniforms,
+        },
+        !window.hasOwnProperty("cordova")
+          ? {
+              bumpMap,
+              bumpScale: 0.1,
+            }
+          : {}
+      )
+    );
     return material;
   }
 
   function createMesh({ material, geometry }) {
-    const mesh = new Mesh(
-      geometry,
-      material,
-    );
+    const mesh = new Mesh(geometry, material);
     mesh.scale.set(1, 0.85 * 0.66, 1);
     Object.assign(mesh.position, position);
     return mesh;
@@ -99,26 +92,26 @@ export default function factory() {
         // const newButtonStopWatch = createStopWatch().start();
         let currentClientX = 0;
         let currentClientY = 0;
-        const isReturningTween = Symbol('returningTween');
+        const isReturningTween = Symbol("returningTween");
         const buttonActions = {
           newButton(screen) {
             buttonCallback({
-              name: 'newButton',
+              name: "newButton",
               screen,
             });
           },
           contButton(screen) {
             buttonCallback({
-              name: 'contButton',
+              name: "contButton",
               screen,
             });
           },
           exitButton(screen) {
             buttonCallback({
-              name: 'exitButton',
+              name: "exitButton",
               screen,
             });
-          }
+          },
         };
         const mouseIn = {
           newButton: false,
@@ -149,37 +142,49 @@ export default function factory() {
         const SLIDE_IN_TIME = 3000;
         const slideInTween = {
           newButton: new Tween(objects.newButton.position)
-            .to({
-              x: -0.75,
-            }, SLIDE_IN_TIME)
-            .easing(Tween.Easing.Exponential.InOut)
+            .to(
+              {
+                x: -0.75,
+              },
+              SLIDE_IN_TIME
+            )
+            .easing(Easing.Exponential.InOut)
             .onComplete(() => {
               slideIn.newButton = false;
             }),
 
           settingsButton: new Tween(objects.settingsButton.position)
-            .to({
-              x: 0.75,
-            }, SLIDE_IN_TIME)
-            .easing(Tween.Easing.Exponential.InOut)
+            .to(
+              {
+                x: 0.75,
+              },
+              SLIDE_IN_TIME
+            )
+            .easing(Easing.Exponential.InOut)
             .onComplete(() => {
               slideIn.settingsButton = false;
             }),
 
           exitButton: new Tween(objects.exitButton.position)
-            .to({
-              x: 0.75,
-            }, SLIDE_IN_TIME)
-            .easing(Tween.Easing.Exponential.InOut)
+            .to(
+              {
+                x: 0.75,
+              },
+              SLIDE_IN_TIME
+            )
+            .easing(Easing.Exponential.InOut)
             .onComplete(() => {
               slideIn.exitButton = false;
             }),
 
           contButton: new Tween(objects.contButton.position)
-            .to({
-              x: -0.75,
-            }, SLIDE_IN_TIME)
-            .easing(Tween.Easing.Exponential.InOut)
+            .to(
+              {
+                x: -0.75,
+              },
+              SLIDE_IN_TIME
+            )
+            .easing(Easing.Exponential.InOut)
             .onComplete(() => {
               slideIn.contButton = false;
             }),
@@ -198,17 +203,19 @@ export default function factory() {
 
         function hitCheck(object3D) {
           const { width, height } = titleDimensions(getState());
-            // Convert mouse coordinates to x, y clamped between -1 and 1.  Also invert y
-          const y = (((height - currentClientY) / height) * 2) - 1;
-          const x = (((currentClientX - width) / width) * 2) + 1;
+          // Convert mouse coordinates to x, y clamped between -1 and 1.  Also invert y
+          const y = ((height - currentClientY) / height) * 2 - 1;
+          const x = ((currentClientX - width) / width) * 2 + 1;
           raycaster.setFromCamera({ x, y }, camera);
           const intersects = raycaster.intersectObject(object3D);
           const isInstersected = !!intersects.length;
-          return isInstersected ? {
-            screen: { x, y },
-            camera,
-            ...intersects[0],
-          } : null;
+          return isInstersected
+            ? {
+                screen: { x, y },
+                camera,
+                ...intersects[0],
+              }
+            : null;
         }
 
         function mouseMoveHandlerForButton(name) {
@@ -246,17 +253,23 @@ export default function factory() {
 
         function handler(event) {
           updatePositionForEvent(event);
-          ['newButton', 'settingsButton', 'exitButton', 'contButton'].forEach(mouseMoveHandlerForButton);
+          ["newButton", "settingsButton", "exitButton", "contButton"].forEach(
+            mouseMoveHandlerForButton
+          );
         }
 
         function handleMouseDown(event) {
           updatePositionForEvent(event);
-          ['newButton', 'settingsButton', 'exitButton', 'contButton'].forEach(mouseDownHandlerForButton);
+          ["newButton", "settingsButton", "exitButton", "contButton"].forEach(
+            mouseDownHandlerForButton
+          );
         }
 
         function handleMouseUp(event) {
           updatePositionForEvent(event);
-          ['newButton', 'settingsButton', 'exitButton', 'contButton'].forEach(mouseUpHandlerForButton);
+          ["newButton", "settingsButton", "exitButton", "contButton"].forEach(
+            mouseUpHandlerForButton
+          );
         }
 
         function onTouchStart(touchEvent) {
@@ -265,7 +278,9 @@ export default function factory() {
           touchEvent.stopPropagation();
           if (touches.length) {
             updatePositionForEvent(touches[0]);
-            ['newButton', 'settingsButton', 'exitButton', 'contButton'].forEach(mouseDownHandlerForButton);
+            ["newButton", "settingsButton", "exitButton", "contButton"].forEach(
+              mouseDownHandlerForButton
+            );
           }
         }
 
@@ -275,52 +290,70 @@ export default function factory() {
           touchEvent.stopPropagation();
           if (touches.length) {
             updatePositionForEvent(touches[0]);
-            ['newButton', 'settingsButton', 'exitButton', 'contButton'].forEach(mouseMoveHandlerForButton);
+            ["newButton", "settingsButton", "exitButton", "contButton"].forEach(
+              mouseMoveHandlerForButton
+            );
           }
         }
 
         function onTouchEnd({ changedTouches: touches }) {
           if (touches.length) {
             updatePositionForEvent(touches[0]);
-            ['newButton', 'settingsButton', 'exitButton', 'contButton'].forEach(mouseUpHandlerForButton);
+            ["newButton", "settingsButton", "exitButton", "contButton"].forEach(
+              mouseUpHandlerForButton
+            );
           }
         }
 
         function onTouchCancel() {
-          ['newButton', 'settingsButton', 'exitButton', 'contButton'].forEach(mouseUpHandlerForButton);
+          ["newButton", "settingsButton", "exitButton", "contButton"].forEach(
+            mouseUpHandlerForButton
+          );
         }
 
-        window.document.addEventListener('mousemove', handler);
-        window.document.addEventListener('mousedown', handleMouseDown);
-        window.document.addEventListener('mouseup', handleMouseUp);
-        window.document.addEventListener('touchstart', onTouchStart, { passive: false });
-        window.document.addEventListener('touchmove', onTouchMove, { passive: false });
-        window.document.addEventListener('touchend', onTouchEnd);
-        window.document.addEventListener('touchcancel', onTouchCancel);
+        window.document.addEventListener("mousemove", handler);
+        window.document.addEventListener("mousedown", handleMouseDown);
+        window.document.addEventListener("mouseup", handleMouseUp);
+        window.document.addEventListener("touchstart", onTouchStart, {
+          passive: false,
+        });
+        window.document.addEventListener("touchmove", onTouchMove, {
+          passive: false,
+        });
+        window.document.addEventListener("touchend", onTouchEnd);
+        window.document.addEventListener("touchcancel", onTouchCancel);
         cleanUp = () => {
-          window.document.removeEventListener('mousemove', handler);
-          window.document.removeEventListener('mousedown', handleMouseDown);
-          window.document.removeEventListener('mouseup', handleMouseUp);
-          window.document.removeEventListener('touchstart', onTouchStart);
-          window.document.removeEventListener('touchmove', onTouchMove);
-          window.document.removeEventListener('touchend', onTouchEnd);
-          window.document.removeEventListener('touchcancel', onTouchCancel);
+          window.document.removeEventListener("mousemove", handler);
+          window.document.removeEventListener("mousedown", handleMouseDown);
+          window.document.removeEventListener("mouseup", handleMouseUp);
+          window.document.removeEventListener("touchstart", onTouchStart);
+          window.document.removeEventListener("touchmove", onTouchMove);
+          window.document.removeEventListener("touchend", onTouchEnd);
+          window.document.removeEventListener("touchcancel", onTouchCancel);
         };
         renderEvents.onDestroy(cleanUp);
       },
       load() {
         return Promise.all([
-          createTexture(newMap).then(map => textures.newMap = map),
-          createTexture(newBumpMap).then(map => textures.newBumpMap = map),
-          createTexture(settingsMap).then(map => textures.settingsMap = map),
-          createTexture(settingsBumpMap).then(map => textures.settingsBumpMap = map),
-          createTexture(exitMap).then(map => textures.exitMap = map),
-          createTexture(exitBumpMap).then(map => textures.exitBumpMap = map),
-          createTexture(contMap).then(map => textures.contMap = map),
-          createTexture(contBumpMap).then(map => textures.contBumpMap = map),
+          createTexture(newMap).then((map) => (textures.newMap = map)),
+          createTexture(newBumpMap).then((map) => (textures.newBumpMap = map)),
+          createTexture(settingsMap).then(
+            (map) => (textures.settingsMap = map)
+          ),
+          createTexture(settingsBumpMap).then(
+            (map) => (textures.settingsBumpMap = map)
+          ),
+          createTexture(exitMap).then((map) => (textures.exitMap = map)),
+          createTexture(exitBumpMap).then(
+            (map) => (textures.exitBumpMap = map)
+          ),
+          createTexture(contMap).then((map) => (textures.contMap = map)),
+          createTexture(contBumpMap).then(
+            (map) => (textures.contBumpMap = map)
+          ),
         ]);
       },
-      * createObject3D() {
+      *createObject3D() {
         objects.newButton = createButton({
           map: textures.newMap,
           bumpMap: textures.newBumpMap,

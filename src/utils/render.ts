@@ -1,6 +1,6 @@
-import raf from 'raf';
-import loggerFactory from 'utils/logger';
-import Tween from '@tweenjs/tween.js';
+import raf from "raf";
+import loggerFactory from "utils/logger";
+import { update as tweenUpdate } from "@tweenjs/tween.js";
 
 const logger = loggerFactory(__filename);
 
@@ -12,12 +12,12 @@ let isActive = false;
 
 export function render() {
   if (isActive) {
-    Tween.update();
+    tweenUpdate();
     try {
       if (!document.hidden) {
-        onBefores.forEach(r => r());
-        onRenders.forEach(r => r());
-        onAfters.forEach(r => r());
+        onBefores.forEach((r) => r());
+        onRenders.forEach((r) => r());
+        onAfters.forEach((r) => r());
       }
     } catch (err) {
       logger.error(err);
@@ -34,7 +34,7 @@ export function reset() {
   onRenders = [];
   onAfters = [];
   isActive = false;
-  onDestroy.forEach(r => r());
+  onDestroy.forEach((r) => r());
   onDestroy = [];
 }
 

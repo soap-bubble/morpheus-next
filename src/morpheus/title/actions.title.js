@@ -4,16 +4,14 @@ import {
   ShaderMaterial,
   TextureLoader,
   Vector2,
-} from 'three';
-import Tween from '@tweenjs/tween.js';
-import renderEvents from 'utils/render';
-import {
-  getAssetUrl,
-} from 'service/gamedb';
+} from "three";
+import { Tween, Easing } from "@tweenjs/tween.js";
+import renderEvents from "utils/render";
+import { getAssetUrl } from "service/gamedb";
 import {
   basicVertexShader as vertexShader,
   multiRippleFragmentShader,
-} from './shaders';
+} from "./shaders";
 
 function createGeometry() {
   const geometry = new PlaneGeometry(1, 0.5, 64, 64);
@@ -33,15 +31,14 @@ function createMaterial({ uniforms }) {
 const textureLoader = new TextureLoader();
 
 function createTexture() {
-  const texture = textureLoader.load(getAssetUrl('GameDB/All/morpheus-title', 'png'));
+  const texture = textureLoader.load(
+    getAssetUrl("GameDB/All/morpheus-title", "png")
+  );
   return texture;
 }
 
 function createMesh({ material, geometry }) {
-  const mesh = new Mesh(
-    geometry,
-    material,
-  );
+  const mesh = new Mesh(geometry, material);
   const size = 1 / 1.8;
   mesh.scale.set(3 * size, 2 * size, 1);
   mesh.position.y = 0.5;
@@ -78,17 +75,23 @@ export default function factory() {
         };
         for (let i = 0; i < 5; i++) {
           ripples[i].tween = new Tween(ripples[i])
-            .to({
-              freq: 0.001,
-            }, 7000)
-            .easing(Tween.Easing.Exponential.Out)
+            .to(
+              {
+                freq: 0.001,
+              },
+              7000
+            )
+            .easing(Easing.Exponential.Out)
             .start();
         }
         const opacityTween = new Tween(v)
-          .to({
-            opacity: 1,
-          }, 7000)
-          .easing(Tween.Easing.Sinusoidal.In);
+          .to(
+            {
+              opacity: 1,
+            },
+            7000
+          )
+          .easing(Easing.Sinusoidal.In);
 
         opacityTween.start();
 
@@ -103,18 +106,18 @@ export default function factory() {
           ripples.forEach(({ tween }) => tween.stop());
         });
       },
-      * createObject3D() {
+      *createObject3D() {
         uniforms = {
-          time: { type: 'f', value: 1.0 },
-          center: { type: 'fv2', value: [] },
-          freq: { type: 'fv1', value: [] },
-          opacity: { type: 'f', value: 0.0 },
-          texture: { type: 't', value: createTexture() },
+          time: { type: "f", value: 1.0 },
+          center: { type: "fv2", value: [] },
+          freq: { type: "fv1", value: [] },
+          opacity: { type: "f", value: 0.0 },
+          tex: { type: "t", value: createTexture() },
         };
         for (let i = 0; i < 5; i++) {
           ripples[i] = {
             pos: new Vector2(Math.random(), Math.random()),
-            freq: 2 + (Math.random() * 3),
+            freq: 2 + Math.random() * 3,
           };
         }
         updateRipples();

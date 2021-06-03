@@ -6,21 +6,14 @@ import {
   ShaderMaterial,
   VideoTexture,
   Vector2,
-} from 'three';
-import {
-  selectors as gameSelectors,
-} from 'morpheus/game';
-import Tween from '@tweenjs/tween.js';
-import { getAssetUrl } from 'service/gamedb';
-import renderEvents from 'utils/render';
-import { createVideo } from 'utils/video';
-import {
-  titleDone,
-} from './actions';
-import {
-  basicVertexShader,
-  rippleDissolveFragmentShader,
-} from './shaders';
+} from "three";
+import { selectors as gameSelectors } from "morpheus/game";
+import { Tween, Easing } from "@tweenjs/tween.js";
+import { getAssetUrl } from "service/gamedb";
+import renderEvents from "utils/render";
+import { createVideo } from "utils/video";
+import { titleDone } from "./actions";
+import { basicVertexShader, rippleDissolveFragmentShader } from "./shaders";
 
 function createGeometry() {
   const geometry = new PlaneGeometry(1, 1, 1, 1);
@@ -38,19 +31,12 @@ function createMaterial({ uniforms }) {
 }
 
 function createMesh({ material, geometry, position }) {
-  const mesh = new Mesh(
-    geometry,
-    material,
-  );
+  const mesh = new Mesh(geometry, material);
   Object.assign(mesh.position, position);
   return mesh;
 }
 
-function createObject({
-  uniforms,
-  position,
-  aspectRatio,
-}) {
+function createObject({ uniforms, position, aspectRatio }) {
   const obj = createMesh({
     material: createMaterial({
       uniforms,
@@ -66,31 +52,27 @@ function createObject({
 
 export default function factory({ canvas: sourceCanvas }) {
   return (dispatch, getState) => {
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = 1024;
     canvas.height = 1024;
     const aspectRatio = sourceCanvas.width / sourceCanvas.height;
-    const texture = new CanvasTexture(
-      canvas,
-    );
-    const video = createVideo(getAssetUrl('GameDB/Deck1/introMOV'));
+    const texture = new CanvasTexture(canvas);
+    const video = createVideo(getAssetUrl("GameDB/Deck1/introMOV"));
     video.volume = gameSelectors.htmlVolume(getState());
-    const videoTexture = new VideoTexture(
-      video,
-    );
+    const videoTexture = new VideoTexture(video);
     videoTexture.minFilter = NearestFilter;
     const uniforms = {
-      time: { type: 'f', value: 1.0 },
-      center: { type: 'fv2', value: new Vector2(0.0, 0.0) },
-      freq: { type: 'fv1', value: 0.0 },
-      dissolve: { type: 'f', value: 0.0 },
-      textureIn: { type: 't', value: texture },
-      textureOut: { type: 't', value: videoTexture },
+      time: { type: "f", value: 1.0 },
+      center: { type: "fv2", value: new Vector2(0.0, 0.0) },
+      freq: { type: "fv1", value: 0.0 },
+      dissolve: { type: "f", value: 0.0 },
+      textureIn: { type: "t", value: texture },
+      textureOut: { type: "t", value: videoTexture },
     };
     let object3D;
 
     const selfie = {
-      * createObject3D() {
+      *createObject3D() {
         object3D = createObject({
           uniforms,
           aspectRatio,
@@ -102,15 +84,13 @@ export default function factory({ canvas: sourceCanvas }) {
         });
         yield object3D;
       },
-      activate({
-        screen,
-      }) {
+      activate({ screen }) {
         object3D.position.z = 0.5;
         const { x, y } = screen;
         uniforms.center.value = new Vector2((x + 1) / 2, (y + 1) / 2);
         canvas.width = 1024;
         canvas.height = 1024;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(
           sourceCanvas,
           0,
@@ -120,7 +100,7 @@ export default function factory({ canvas: sourceCanvas }) {
           0,
           0,
           1024,
-          1024,
+          1024
         );
 
         texture.needsUpdate = true;
@@ -139,25 +119,34 @@ export default function factory({ canvas: sourceCanvas }) {
           },
         };
         let rippleTween = new Tween(v)
-          .to({
-            freq: 3.0,
-          }, 2000)
-          .easing(Tween.Easing.Exponential.Out)
+          .to(
+            {
+              freq: 3.0,
+            },
+            2000
+          )
+          .easing(Easing.Exponential.Out)
           .onComplete(() => {
             video.play();
             rippleTween = new Tween(v)
-              .to({
-                freq: 0.0,
-              }, 2000)
-              .easing(Tween.Easing.Exponential.Out);
+              .to(
+                {
+                  freq: 0.0,
+                },
+                2000
+              )
+              .easing(Easing.Exponential.Out);
             rippleTween.start();
           })
           .start();
         const dissolveTween = new Tween(v)
-          .to({
-            dissolve: 1.0,
-          }, 4000)
-          .easing(Tween.Easing.Sinusoidal.InOut);
+          .to(
+            {
+              dissolve: 1.0,
+            },
+            4000
+          )
+          .easing(Easing.Sinusoidal.InOut);
 
         rippleTween.start();
         dissolveTween.start();
@@ -197,24 +186,28 @@ export default function factory({ canvas: sourceCanvas }) {
 
         allDone = () => {
           video.pause();
-          window.document.removeEventListener('mousedown', handleMouseDown);
-          window.document.removeEventListener('mouseup', handleMouseUp);
-          window.document.removeEventListener('touchstart', handleTouchStart);
-          window.document.removeEventListener('touchmove', handleTouchMove);
-          window.document.removeEventListener('touchend', handleMouseUp);
+          window.document.removeEventListener("mousedown", handleMouseDown);
+          window.document.removeEventListener("mouseup", handleMouseUp);
+          window.document.removeEventListener("touchstart", handleTouchStart);
+          window.document.removeEventListener("touchmove", handleTouchMove);
+          window.document.removeEventListener("touchend", handleMouseUp);
           dispatch(titleDone());
         };
 
-        video.addEventListener('ended', function videoEnded() {
-          video.removeEventListener('ended', videoEnded);
+        video.addEventListener("ended", function videoEnded() {
+          video.removeEventListener("ended", videoEnded);
           allDone();
         });
 
-        window.document.addEventListener('mousedown', handleMouseDown);
-        window.document.addEventListener('mouseup', handleMouseUp);
-        window.document.addEventListener('touchstart', handleTouchStart, { passive: false });
-        window.document.addEventListener('touchmove', handleTouchMove, { passive: false });
-        window.document.addEventListener('touchend', handleMouseUp);
+        window.document.addEventListener("mousedown", handleMouseDown);
+        window.document.addEventListener("mouseup", handleMouseUp);
+        window.document.addEventListener("touchstart", handleTouchStart, {
+          passive: false,
+        });
+        window.document.addEventListener("touchmove", handleTouchMove, {
+          passive: false,
+        });
+        window.document.addEventListener("touchend", handleMouseUp);
       },
     };
     return selfie;

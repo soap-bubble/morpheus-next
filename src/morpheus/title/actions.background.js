@@ -4,27 +4,16 @@ import {
   ShaderMaterial,
   TextureLoader,
   Vector2,
-} from 'three';
-import Tween  from '@tweenjs/tween.js';
-import { getAssetUrl } from 'service/gamedb';
-import renderEvents from 'utils/render';
+} from "three";
+import { Tween, Easing } from "@tweenjs/tween.js";
+import { getAssetUrl } from "service/gamedb";
+import renderEvents from "utils/render";
 
-import {
-  leaving,
-  done,
-} from './actions';
-import {
-  titleDimensions,
-} from './selectors';
-import {
-  basicVertexShader,
-  multiRippleFragmentShader,
-} from './shaders';
+import { leaving, done } from "./actions";
+import { titleDimensions } from "./selectors";
+import { basicVertexShader, multiRippleFragmentShader } from "./shaders";
 
-function createBackground({
-  position,
-  uniforms,
-}) {
+function createBackground({ position, uniforms }) {
   function createGeometry() {
     const size = 1.12;
     const geometry = new PlaneGeometry(size * 4, size * 3, 1, 1);
@@ -41,10 +30,7 @@ function createBackground({
   }
 
   function createMesh({ material, geometry }) {
-    const mesh = new Mesh(
-      geometry,
-      material,
-    );
+    const mesh = new Mesh(geometry, material);
     Object.assign(mesh.position, position);
     return mesh;
   }
@@ -73,17 +59,23 @@ export default function factory() {
         };
         for (let i = 0; i < 5; i++) {
           ripples[i].tween = new Tween(ripples[i])
-            .to({
-              freq: 0.01,
-            }, 6000)
-            .easing(Tween.Easing.Quadratic.Out)
+            .to(
+              {
+                freq: 0.01,
+              },
+              6000
+            )
+            .easing(Easing.Quadratic.Out)
             .start();
         }
         const fadeTween = new Tween(v)
-          .to({
-            fade: 1.0,
-          }, 2000)
-          .easing(Tween.Easing.Sinusoidal.In);
+          .to(
+            {
+              fade: 1.0,
+            },
+            2000
+          )
+          .easing(Easing.Sinusoidal.In);
 
         fadeTween.start();
         const startTime = Date.now();
@@ -102,25 +94,27 @@ export default function factory() {
           ripples.forEach(({ tween }) => tween.stop());
         });
       },
-      * createObject3D() {
+      *createObject3D() {
         const textureLoader = new TextureLoader();
 
         function createTexture() {
-          const texture = textureLoader.load(getAssetUrl('GameDB/All/morpheus-background', 'jpg'));
+          const texture = textureLoader.load(
+            getAssetUrl("GameDB/All/morpheus-background", "jpg")
+          );
           return texture;
         }
         uniforms = {
-          time: { type: 'f', value: 1.0 },
-          center: { type: 'fv2', value: [] },
-          freq: { type: 'fv1', value: [] },
-          opacity: { type: 'f', value: 1.0 },
-          fade: { type: 'f', value: 0.0 },
-          texture: { type: 't', value: createTexture() },
+          time: { type: "f", value: 1.0 },
+          center: { type: "fv2", value: [] },
+          freq: { type: "fv1", value: [] },
+          opacity: { type: "f", value: 1.0 },
+          fade: { type: "f", value: 0.0 },
+          tex: { type: "t", value: createTexture() },
         };
         for (let i = 0; i < 5; i++) {
           ripples[i] = {
             pos: new Vector2(Math.random(), Math.random()),
-            freq: 5 + (Math.random() * 8),
+            freq: 5 + Math.random() * 8,
           };
         }
         const freq = [];

@@ -1,10 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-const WhyAmISeeingThis = ({
-  reason,
-}) => (
-  <div className="why-am-i-seeing-this" title={reason} />
+import styles from "./WhyAmISeeingThis.module.css";
+
+const WhyAmISeeingThis = ({ reason }) => (
+  <div className={styles.whyAmISeeingThis} title={reason} />
 );
 
 WhyAmISeeingThis.propTypes = {

@@ -38,14 +38,14 @@ uniform float time;
 uniform float amplitude;
 uniform float intensity;
 uniform float opacity;
-uniform sampler2D texture;
+uniform sampler2D tex;
 
 void main() {
   float scale = 1.8;
   vec2 coord = (vUv.xy - 0.5) * scale + 0.5;
   coord.x = coord.x + (sin(coord.y * intensity + time) * amplitude);
   // coord.y = coord.y + (sin(coord.x * intensity / 25.0 + time) * amplitude);
-  vec4 mapTexel = texture2D( texture, coord.xy );
+  vec4 mapTexel = texture2D( tex, coord.xy );
   if (coord.x > 1.0
     || coord.x < 0.0
     || coord.y > 1.0
@@ -125,7 +125,7 @@ void main()
 export const multiRippleFragmentShader = `
 const int no = 5; //set how many splash-points you want
 
-uniform lowp sampler2D texture;
+uniform lowp sampler2D tex;
 uniform highp float time;
 uniform float opacity;
 uniform float fade;
@@ -144,7 +144,7 @@ void main()
         uv[i] = (p/len)*freq[i]*max(0.2, 2.0-len)*cos(len*24.0-time*5.0)*0.02;
         uv[no] += uv[i]; //tally total
     }
-    vec4 mapTexel = texture2D(texture,vUv + uv[no]);
+    vec4 mapTexel = texture2D(tex,vUv + uv[no]);
     mapTexel.rgb *= fade;
     mapTexel.a *= opacity;
     gl_FragColor = mapTexel;

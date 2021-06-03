@@ -6,6 +6,7 @@ import Menu from "../components/Menu";
 import Settings from "./Settings";
 import SaveList from "./SaveList";
 import { Scene } from "morpheus/casts/types";
+import { Main } from "morpheus/title";
 
 function mapStateToProps(state: any) {
   return {
@@ -52,9 +53,17 @@ const Game: FC<{
   if (saveOpen) {
     menu.push(<SaveList />);
   }
+  let content = null;
+  if (stageScenes.length) {
+    if (stageScenes[0].sceneId === 1) {
+      content = <Main />;
+    } else {
+      <NewGame stageScenes={stageScenes} />;
+    }
+  }
   return (
     <div id={id} className={className} style={style}>
-      {stageScenes.length && <NewGame stageScenes={stageScenes} />}
+      {content}
       {menu}
     </div>
   );
