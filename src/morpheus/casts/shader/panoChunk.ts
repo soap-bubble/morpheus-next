@@ -1,9 +1,9 @@
-import { BackSide, ShaderChunk, Vector2 } from 'three'
+import { BackSide, ShaderChunk, Vector2 } from "three";
 
 const pano: any = {
   uniforms: {
-    texture: { type: 't', value: null },
-    offset: { type: 'float', value: 0 },
+    tex: { type: "t", value: null },
+    offset: { type: "float", value: 0 },
   },
   vertexShader: `
   varying vec2 vUv;
@@ -13,24 +13,24 @@ const pano: any = {
   }
 `,
   fragmentShader: `
-  uniform lowp sampler2D texture;
+  uniform lowp sampler2D tex;
   uniform lowp float offset;
   varying vec2 vUv;
 
   #define border 0.001
   #define outterRadius 0.01
 
-  ${ShaderChunk['common']}
+  ${ShaderChunk["common"]}
 
   void main()
   {
       vec2 imgOffset = (1.0 - vUv);
       imgOffset *= (7.0 / 8.0);
       imgOffset.x += offset / 1024.0;
-      gl_FragColor = texture2D(texture, imgOffset);
+      gl_FragColor = texture2D(tex, imgOffset);
   }
 `,
   side: BackSide,
-}
+};
 
-export default pano
+export default pano;

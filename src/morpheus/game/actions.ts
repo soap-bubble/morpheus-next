@@ -584,18 +584,19 @@ export const localLoadEpic = createEpic((action$, store$) =>
   )
 );
 
-export const browserLoad: ActionCreator<ThunkAction<void, any, any, Action>> =
-  () => {
-    return (dispatch) => {
-      // @ts-ignore
-      const payload = storage.get("save");
-      dispatch({
-        type: BROWSER_LOAD,
-        payload,
-      });
-      return !!payload;
-    };
+export const browserLoad: ActionCreator<
+  ThunkAction<boolean, any, any, Action>
+> = () => {
+  return (dispatch) => {
+    // @ts-ignore
+    const payload = storage.get("save");
+    dispatch({
+      type: BROWSER_LOAD,
+      payload,
+    });
+    return !!payload;
   };
+};
 
 export const browserLoadEpic = createEpic((action$) =>
   action$.pipe(

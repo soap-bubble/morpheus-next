@@ -65,6 +65,7 @@ const Canvas = ({
       onPointerLeave={onPointerLeave}
       style={{
         cursor: "none",
+        position: "absolute",
         width: `${width}px`,
         height: `${height}px`,
         left: `${left}px`,

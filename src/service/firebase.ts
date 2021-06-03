@@ -1,6 +1,6 @@
 import firebaseClient from "firebase/app";
 import "firebase/auth";
-import "firebase/database";
+import "firebase/firestore";
 import "firebase/storage";
 
 const CLIENT_CONFIG = {

@@ -1,3 +1,3 @@
-import App from "morpheus/app";
+import App from "morpheus/app/app";
 
 export default App;
