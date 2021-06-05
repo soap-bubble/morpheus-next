@@ -27,9 +27,11 @@ export default function Index() {
             })
           : compose;
       middleware = composeEnhancers(
+        // @ts-ignore
         applyMiddleware(epicMiddleware, thunkMiddleware)
       );
     } else {
+      // @ts-ignore
       middleware = applyMiddleware(epicMiddleware, thunkMiddleware);
     }
 

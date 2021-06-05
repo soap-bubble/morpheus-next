@@ -1,8 +1,8 @@
-import { flow, partialRight, filter, entries, map } from 'lodash'
-import cache from './cache'
+import { flow, partialRight, filter, entries, map } from "lodash";
+import cache from "./cache";
 // @ts-ignore
-import * as modules from './modules'
-import { Scene } from './types'
+import * as modules from "./modules";
+import { Scene } from "./types";
 import {
   LOADING,
   ENTERING,
@@ -10,8 +10,8 @@ import {
   ON_STAGE,
   PRELOAD,
   UNLOADING,
-} from './actionTypes'
-import { createSelector } from 'reselect'
+} from "./actionTypes";
+import { createSelector } from "reselect";
 
 function allSceneIdsForStatus(status: string) {
   return flow(
@@ -23,17 +23,17 @@ function allSceneIdsForStatus(status: string) {
         sceneId && cacheEntry.status === status
     ),
     partialRight(map, ([sceneId]: [string]) => Number(sceneId))
-  )
+  );
 }
 
-export const preloadedSceneIds = allSceneIdsForStatus(PRELOAD)
+export const preloadedSceneIds = allSceneIdsForStatus(PRELOAD);
 
 export function forScene(scene: Scene) {
   const selectCastCacheForThisScene = () =>
-    (scene && cache[scene.sceneId]) || {}
+    (scene && cache[scene.sceneId]) || {};
 
   const forStatus = (status: String) =>
-    selectCastCacheForThisScene().status === status
+    selectCastCacheForThisScene().status === status;
 
   const castSelectors = {
     cache: selectCastCacheForThisScene,
@@ -43,27 +43,28 @@ export function forScene(scene: Scene) {
     isExiting: forStatus(EXITING),
     isUnloading: forStatus(UNLOADING),
     isPreloading: forStatus(PRELOAD),
-  }
-  const moduleSelectors = Object.keys(modules).reduce((memo, name) => {
-    if (modules[name].selectors) {
-      memo[name] = modules[name].selectors
+  };
+  const moduleNames = Object.keys(modules) as (keyof typeof modules)[];
+  const moduleSelectors = moduleNames.reduce((memo, name) => {
+    if (modules[name]?.selectors) {
+      memo[name] = modules[name].selectors;
     }
-    return memo
-  }, {} as { [key: string]: any })
+    return memo;
+  }, {} as { [key in keyof typeof modules]: any });
   Object.defineProperties(
     castSelectors,
-    Object.keys(moduleSelectors).reduce(
+    moduleNames.reduce(
       (memo, name) =>
         Object.assign(memo, {
           [name]: {
             get() {
-              return moduleSelectors[name](scene)
+              return moduleSelectors[name](scene);
             },
           },
         }),
       {}
     )
-  )
+  );
 
-  return castSelectors
+  return castSelectors;
 }

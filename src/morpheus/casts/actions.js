@@ -1,10 +1,10 @@
-import { get } from 'lodash'
-import memoize from 'utils/memoize'
-import loggerFactory from 'utils/logger'
-import cache from './cache'
-import { selectors as sceneSelectors } from 'morpheus/scene'
-import createWebGLRendererPool from './webglPool'
-import { forScene as cacheForScene, preloadedSceneIds } from './selectors'
+import { get } from "lodash";
+import memoize from "utils/memoize";
+import loggerFactory from "utils/logger";
+import cache from "./cache";
+import { selectors as sceneSelectors } from "morpheus/scene";
+import createWebGLRendererPool from "./webglPool";
+import { forScene as cacheForScene, preloadedSceneIds } from "./selectors";
 import {
   PRELOAD,
   LOADING,
@@ -15,45 +15,44 @@ import {
   RESUME,
   UNLOADING,
   UNPRELOAD,
-} from './actionTypes'
-import * as modules from './modules'
+} from "./actionTypes";
+import * as modules from "./modules";
 
-const logger = loggerFactory('cast:actions')
+const logger = loggerFactory("cast:actions");
 
-const webGlPool = createWebGLRendererPool()
+const webGlPool = createWebGLRendererPool();
 
 function updateCache({ actionName, sceneId, castData, castType }) {
-  if (['doUnload', 'doPreunload'].indexOf(actionName) !== -1) {
-    delete cache[sceneId]
+  if (["doUnload", "doPreunload"].indexOf(actionName) !== -1) {
+    delete cache[sceneId];
   } else {
-    const oldSceneCache = cache[sceneId] ? cache[sceneId] : {}
+    const oldSceneCache = cache[sceneId] ? cache[sceneId] : {};
     cache[sceneId] = {
       ...cache[sceneId],
       [castType]: {
         ...oldSceneCache[castType],
         ...castData,
       },
-    }
+    };
   }
 }
 
 export function dispatchCastState({ event, castState, castType, scene }) {
   return {
     type: event,
-    payload: castState,
-    meta: { type: castType, scene },
-  }
+    payload: { type: castType, scene, castState },
+  };
 }
 
 function doActionForCast({ event, scene, castType, action, actionName }) {
-  return dispatch => {
-    const myCache = get(cache, `${scene.sceneId}.${castType}`, {})
+  return (dispatch) => {
+    const myCache = get(cache, `${scene.sceneId}.${castType}`, {});
     logger.info({
-      message: 'doActionForCast',
+      message: "doActionForCast",
       sceneId: scene.sceneId,
       actionName,
       castType,
-    })
+    });
     function setState(state) {
       dispatch(
         dispatchCastState({
@@ -62,13 +61,13 @@ function doActionForCast({ event, scene, castType, action, actionName }) {
           castType,
           scene,
         })
-      )
+      );
       updateCache({
         actionName,
         castData: state,
         castType,
         sceneId: scene.sceneId,
-      })
+      });
     }
     return Promise.resolve(
       dispatch(
@@ -81,57 +80,57 @@ function doActionForCast({ event, scene, castType, action, actionName }) {
       )
     )
       .then(setState)
-      .catch(err => {
-        console.error(err)
-      })
-  }
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 }
 
 export const lifecycle = [
   {
-    action: 'doPreload',
+    action: "doPreload",
     event: PRELOAD,
   },
   {
-    action: 'doLoad',
+    action: "doLoad",
     event: LOADING,
   },
   {
-    action: 'doEnter',
+    action: "doEnter",
     event: ENTERING,
   },
   {
-    action: 'onStage',
+    action: "onStage",
     event: ON_STAGE,
   },
   {
-    action: 'doExit',
+    action: "doExit",
     event: EXITING,
   },
   {
-    action: 'doPause',
+    action: "doPause",
     event: PAUSE,
   },
   {
-    action: 'doResume',
+    action: "doResume",
     event: RESUME,
   },
   {
-    action: 'doUnload',
+    action: "doUnload",
     event: UNLOADING,
   },
   {
-    action: 'doPreunload',
+    action: "doPreunload",
     event: UNPRELOAD,
   },
 ].reduce((memo, { action, event }) => {
   memo[action] = function moduleAction(scene) {
     return (dispatch, getState) =>
       Promise.all(
-        Object.keys(modules.default).map(cast => {
-          const module = modules.default[cast]
+        Object.keys(modules.default).map((cast) => {
+          const module = modules.default[cast];
           if (scene) {
-            const delegate = module.delegate && module.delegate(scene)
+            const delegate = module.delegate && module.delegate(scene);
             if (
               delegate &&
               delegate &&
@@ -146,46 +145,46 @@ export const lifecycle = [
                   action: delegate[action],
                   actionName: action,
                 })
-              )
-              if (action === 'doUnload') {
-                promise = promise.then(result => {
+              );
+              if (action === "doUnload") {
+                promise = promise.then((result) => {
                   if (module.selectors && module.selectors.cache) {
-                    module.selectors.cache.delete(scene._id)
+                    module.selectors.cache.delete(scene._id);
                   }
                   if (module.delegate && module.delegate.cache) {
-                    module.delegate.cache.delete(scene._id)
+                    module.delegate.cache.delete(scene._id);
                   }
                   if (module.actions && module.actions.cache) {
-                    module.actions.cache.delete(scene._id)
+                    module.actions.cache.delete(scene._id);
                   }
-                  return result
-                })
+                  return result;
+                });
               }
-              return promise
+              return promise;
             }
           }
-          return Promise.resolve()
+          return Promise.resolve();
         })
-      ).then(() => scene)
-  }
-  return memo
-}, {})
+      ).then(() => scene);
+  };
+  return memo;
+}, {});
 
-export const forScene = memoize(scene => {
+export const forScene = memoize((scene) => {
   const moduleActions = Object.keys(modules.default).reduce((memo, name) => {
     if (modules.default[name].actions) {
-      memo[name] = modules.default[name].actions
+      memo[name] = modules.default[name].actions;
     }
-    return memo
-  }, {})
+    return memo;
+  }, {});
   return Object.defineProperties(
     {
       update(updateEvent) {
-        return dispatch => {
-          Object.keys(modules.default).forEach(name => {
-            const module = modules.default[name]
+        return (dispatch) => {
+          Object.keys(modules.default).forEach((name) => {
+            const module = modules.default[name];
             if (module && module.delegate) {
-              const delegate = module.delegate(scene)
+              const delegate = module.delegate(scene);
               if (delegate.update && delegate.applies(scene)) {
                 try {
                   dispatch(
@@ -193,14 +192,14 @@ export const forScene = memoize(scene => {
                       ...cacheForScene(scene).cache()[name],
                       updateEvent,
                     })
-                  )
+                  );
                 } catch (err) {
-                  console.error(err)
+                  console.error(err);
                 }
               }
             }
-          })
-        }
+          });
+        };
       },
     },
     Object.keys(moduleActions).reduce(
@@ -208,16 +207,16 @@ export const forScene = memoize(scene => {
         Object.assign(memo, {
           [name]: {
             get() {
-              return moduleActions[name](scene)
+              return moduleActions[name](scene);
             },
           },
         }),
       {}
     )
-  )
-})
+  );
+});
 
 export function unpreloadAll() {
   return (dispatch, getState) =>
-    dispatch(unpreloadScenes(...preloadedSceneIds(getState())))
+    dispatch(unpreloadScenes(...preloadedSceneIds(getState())));
 }

@@ -1,8 +1,6 @@
-import {
-  omit,
-} from 'lodash';
-import createReducer from 'utils/createReducer';
-import { Scene } from './types'
+import { omit } from "lodash";
+import createReducer from "utils/createReducer";
+import { Scene } from "./types";
 import {
   PRELOAD,
   LOADING,
@@ -11,11 +9,32 @@ import {
   ON_STAGE,
   UNLOADING,
   UNPRELOAD,
-} from './actionTypes';
+} from "./actionTypes";
+import { Action } from "redux";
+
+export type CastActionPayload = {
+  payload: { type: String; scene: Scene; castState: any };
+};
+
+export type CastActionTypes =
+  | typeof PRELOAD
+  | typeof LOADING
+  | typeof ENTERING
+  | typeof EXITING
+  | typeof ON_STAGE
+  | typeof UNLOADING
+  | typeof UNPRELOAD;
+
+export type CastAction = Action<CastActionTypes> & CastActionPayload;
 
 function withStatus(status: string) {
-  return (state: any, { meta: { scene } }: { meta: { scene: Scene }}) => {
-    const oldSceneCache = state.cache[scene.sceneId] ? state.cache[scene.sceneId] : {};
+  return (
+    state: any,
+    { payload: { scene } }: { payload: { scene: Scene } }
+  ) => {
+    const oldSceneCache = state.cache[scene.sceneId]
+      ? state.cache[scene.sceneId]
+      : {};
     return {
       ...state,
       cache: {
@@ -33,28 +52,31 @@ function withStatus(status: string) {
   };
 }
 
-
-const reducer = createReducer('casts', {
-  cache: {},
-}, {
-  [LOADING]: withStatus(ENTERING),
-  [PRELOAD]: withStatus(PRELOAD),
-  [ENTERING]: withStatus(ENTERING),
-  [EXITING]: withStatus(EXITING),
-  [ON_STAGE]: withStatus(ON_STAGE),
-  [UNPRELOAD](state, { meta: { scene } }) {
-    return {
-      ...state,
-      cache: omit(state.cache, scene.sceneId),
-    };
+const reducer = createReducer<any, CastAction>(
+  "casts",
+  {
+    cache: {},
   },
-  [UNLOADING](state, { meta: { scene } }) {
-    return {
-      ...state,
-      cache: omit(state.cache, scene.sceneId),
-    };
-  },
-  [EXITING]: withStatus(EXITING),
-});
+  {
+    [LOADING]: withStatus(ENTERING),
+    [PRELOAD]: withStatus(PRELOAD),
+    [ENTERING]: withStatus(ENTERING),
+    [EXITING]: withStatus(EXITING),
+    [ON_STAGE]: withStatus(ON_STAGE),
+    [UNPRELOAD](state, { payload: { scene } }) {
+      return {
+        ...state,
+        cache: omit(state.cache, scene.sceneId),
+      };
+    },
+    [UNLOADING](state, { payload: { scene } }) {
+      return {
+        ...state,
+        cache: omit(state.cache, scene.sceneId),
+      };
+    },
+    [EXITING]: withStatus(EXITING),
+  }
+);
 
 export default reducer;

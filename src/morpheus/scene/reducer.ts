@@ -1,5 +1,5 @@
-import createReducer from 'utils/createReducer'
-import { isUndefined } from 'lodash'
+import createReducer from "utils/createReducer";
+import { isUndefined } from "lodash";
 import {
   SCENE_SET_BACKGROUND_SCENE,
   SCENE_DO_ENTERING,
@@ -9,50 +9,51 @@ import {
   SCENE_LOAD_START,
   SCENE_LOAD_COMPLETE,
   SCENE_LOAD_ERROR,
-} from './actionTypes'
+} from "./actionTypes";
+import { Scene } from "morpheus/casts/types";
 
 const defaultState = {
   loading: null,
   backgroundScene: null,
-  loadedScenes: [],
-  currentScenes: [],
+  loadedScenes: [] as Scene[],
+  currentScenes: [] as Scene[],
   currentScene: null,
   previousScene: null,
-  status: 'null',
+  status: "null",
   nextStartAngle: 0,
-}
+};
 
-const reducer = createReducer('scene', defaultState, {
+const reducer = createReducer("scene", defaultState, {
   reset() {
-    return defaultState
+    return defaultState;
   },
   [SET_NEXT_START_ANGLE](state, { payload: nextStartAngle }) {
     return {
       ...state,
       nextStartAngle,
-    }
+    };
   },
   [SCENE_LOAD_START](state, { payload: sceneId }) {
     return {
       ...state,
       loading: sceneId,
-    }
+    };
   },
   [SCENE_LOAD_ERROR](state, { payload: sceneId }) {
     // TODO
-    return state
+    return state;
   },
   [SCENE_LOAD_COMPLETE](state, { payload: scene }) {
     return {
       ...state,
       loadedScenes: [...state.loadedScenes, scene],
-    }
+    };
   },
   [SCENE_SET_BACKGROUND_SCENE](state, { payload: scene }) {
     return {
       ...state,
       backgroundScene: scene,
-    }
+    };
   },
   [SCENE_DO_ENTERING](
     state,
@@ -60,25 +61,25 @@ const reducer = createReducer('scene', defaultState, {
   ) {
     return {
       ...state,
-      status: 'entering',
+      status: "entering",
       previousScene,
       currentScene,
       currentScenes,
-    }
+    };
   },
   [SCENE_DO_EXITING](state, { payload: { dissolve } }) {
     return {
       ...state,
-      status: 'exiting',
+      status: "exiting",
       dissolve: isUndefined(dissolve) || !!dissolve,
-    }
+    };
   },
   [SCENE_ENTER_DONE](state) {
     return {
       ...state,
-      status: 'live',
-    }
+      status: "live",
+    };
   },
-})
+});
 
-export default reducer
+export default reducer;

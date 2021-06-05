@@ -1,6 +1,6 @@
 import { from, of } from "rxjs";
 import { map, mergeMap, filter, catchError } from "rxjs/operators";
-import storage from "local-storage";
+import * as storage from "local-storage";
 import createEpic from "utils/createEpic";
 
 import {
@@ -146,8 +146,8 @@ export const drawCursor: ActionCreator<ThunkAction<void, any, any, Action>> =
       if (cursor) {
         const cursorPos = inputSelectors.cursorPosition(getState());
         const screenPos = {
-          x: cursorPos.left - cursor.width / 2,
-          y: cursorPos.top - cursor.height / 2,
+          x: cursorPos.left || 0 - cursor.width / 2,
+          y: cursorPos.top || 0 - cursor.height / 2,
         };
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);

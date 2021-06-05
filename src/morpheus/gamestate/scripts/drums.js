@@ -1,11 +1,7 @@
-import {
-  actions as gamestateActions,
-} from 'morpheus/gamestate';
-import {
-  actions as sceneActions,
-} from 'morpheus/scene';
-import createLogger from 'utils/logger';
-const logger = createLogger('scripts:drum');
+import { actions as gamestateActions } from "morpheus/gamestate";
+import { actions as sceneActions } from "morpheus/scene";
+import createLogger from "utils/logger";
+const logger = createLogger("scripts:drum");
 
 const NUM_OF_DRUMS = 8;
 let numOfBeats = 0;
@@ -20,9 +16,9 @@ function reset() {
 
 export const id = 1007;
 
-export function execute(hotspot, gamestates, isMouseDown = false) {
+export function execute(hotspot, gamestates) {
   return (dispatch, getState) => {
-    logger.debug('START');
+    logger.debug("START");
     // if (!isMouseDown) {
     //   return reset();
     // }
@@ -31,30 +27,26 @@ export function execute(hotspot, gamestates, isMouseDown = false) {
     }
     lastHotSpot = hotspot;
 
-    const {
-      param1,
-      param2,
-      param3,
-    } = hotspot;
+    const { param1, param2, param3 } = hotspot;
     const currentDrum = param3 - 1;
     if (lastDrum === -1 || currentDrum === (lastDrum + 1) % NUM_OF_DRUMS) {
-      logger.debug('Update to curremtDrum', currentDrum);
+      logger.debug("Update to curremtDrum", currentDrum);
       lastDrum = currentDrum;
     } else {
-      logger.debug('NOPE');
+      logger.debug("NOPE");
       return null;
     }
 
     numOfBeats++;
-    logger.debug('--------------->', numOfBeats, '<-------------------')
+    logger.debug("--------------->", numOfBeats, "<-------------------");
     dispatch(gamestateActions.updateGameState(param1, param3));
 
     if (numOfBeats > NUM_OF_DRUMS + NUM_OF_DRUMS / 2) {
-      logger.debug('SUCCESS');
+      logger.debug("SUCCESS");
       if (param2 !== 0) {
         reset();
         dispatch(sceneActions.goToScene(param2, true));
       }
     }
-  }
+  };
 }

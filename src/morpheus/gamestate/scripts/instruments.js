@@ -1,7 +1,4 @@
-
-import {
-  actions as gamestateActions,
-} from 'morpheus/gamestate';
+import { actions as gamestateActions } from "morpheus/gamestate";
 
 const MARACAS_MSC = 2100;
 const GONG_MSC = 2106;
@@ -12,7 +9,7 @@ const MANDOLIN_MSC = 2099;
 
 export const id = 1009;
 
-export function execute({ param1, param2 }) {
+export function execute({ param1, param2 }, gamestates) {
   return (dispatch) => {
     let instrumentTest1 = 0;
     let instrumentTest2 = 0;
