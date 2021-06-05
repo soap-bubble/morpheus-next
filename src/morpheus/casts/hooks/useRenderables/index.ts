@@ -57,7 +57,6 @@ export default function useRenderables(
   exitingScene: Scene | undefined,
   deps: any[]
 ): [MovieCast[], MovieSpecialCast[], SupportedSoundCasts[], Renderable[]] {
-  console.log("cursor", cursor);
   const soundCasts = useMemo(() => {
     if (stageScenes.length) {
       return stageScenes[0].casts.filter(

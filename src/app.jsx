@@ -29,9 +29,6 @@ import socketPromise from 'utils/socket'
 import storeFactory from './store'
 import '../css/main.css'
 
-
-window.React2 = require('react');
-console.log('If false then react is broken:', window.React1 === window.React2);
 const qp = qs.parse(location.search)
 const store = storeFactory()
 
