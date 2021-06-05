@@ -37,16 +37,14 @@ export function gameStateLoadComplete(responseData: any) {
 }
 
 export const fetchInitial: ActionCreator<
-  ThunkAction<Promise<void>, any, any, Action>
+  ThunkAction<Promise<unknown>, any, any, Action>
 > = () => {
   return (dispatch) =>
     fetchInitialGameState()
-      .then((responseData: any) => {
-        dispatch(gameStateLoadComplete(responseData));
-      })
-      .catch((err: any) => {
-        dispatch({ payload: err, type: API_ERROR });
-      });
+      .then((responseData: any) =>
+        dispatch(gameStateLoadComplete(responseData))
+      )
+      .catch((err: any) => dispatch({ payload: err, type: API_ERROR }));
 };
 
 export function updateGameState(gamestateId: number, value: number) {

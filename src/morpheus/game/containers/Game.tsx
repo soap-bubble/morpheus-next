@@ -58,7 +58,7 @@ const Game: FC<{
     if (stageScenes[0].sceneId === 1) {
       content = <Main />;
     } else {
-      <NewGame stageScenes={stageScenes} />;
+      content = <NewGame stageScenes={stageScenes} />;
     }
   }
   return (

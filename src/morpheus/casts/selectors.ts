@@ -55,13 +55,15 @@ export function forScene(scene: Scene) {
     castSelectors,
     moduleNames.reduce(
       (memo, name) =>
-        Object.assign(memo, {
-          [name]: {
-            get() {
-              return moduleSelectors[name](scene);
-            },
-          },
-        }),
+        moduleSelectors[name]
+          ? Object.assign(memo, {
+              [name]: {
+                get() {
+                  return moduleSelectors[name](scene);
+                },
+              },
+            })
+          : memo,
       {}
     )
   );
