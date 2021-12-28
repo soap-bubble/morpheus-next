@@ -1,12 +1,13 @@
-import { reset } from "utils/render";
-import { Action, ActionCreator, Dispatch } from "redux";
-import Events from "events";
-import { actions as inputActions } from "morpheus/input";
-import { selectors as sceneSelectors } from "morpheus/scene";
-import loggerFactory from "utils/logger";
-import { firebaseClient } from "service/firebase";
-import { Scene, UnresolvedScene, Cast } from "../casts/types";
-import createSceneQueue from "./queue";
+import { reset } from 'utils/render';
+import { Action, ActionCreator, Dispatch } from 'redux';
+import Events from 'events';
+import { actions as inputActions } from 'morpheus/input';
+import { selectors as sceneSelectors } from 'morpheus/scene';
+import { fetch as serviceFetchScene } from 'service/scene';
+import loggerFactory from 'utils/logger';
+import { Scene } from '../casts/types';
+import createSceneQueue from './queue';
+import { firebaseClient } from 'service/firebase';
 import {
   SCENE_LOAD_START,
   SCENE_LOAD_ERROR,
@@ -17,10 +18,10 @@ import {
   SCENE_ENTER_DONE,
   SCENE_DO_EXITING,
   SET_NEXT_START_ANGLE,
-} from "./actionTypes";
-import { ThunkAction } from "redux-thunk";
+} from './actionTypes';
+import { ThunkAction } from 'redux-thunk';
 
-const logger = loggerFactory("scene:actions");
+const logger = loggerFactory('scene:actions');
 export const events = new Events();
 export const sceneLoadQueue = createSceneQueue();
 
@@ -40,7 +41,7 @@ export const sceneLoadStarted: ActionCreator<Action> = (
   id: string,
   fetchPromise: Promise<any>
 ) => {
-  logger.info("sceneLoadStarted", id);
+  logger.info('sceneLoadStarted', id);
   return {
     type: SCENE_LOAD_START,
     payload: id,
@@ -52,53 +53,14 @@ export const fetch: ActionCreator<
   ThunkAction<Promise<Scene | null>, any, any, Action>
 > = (sceneId: number) => {
   return async (dispatch: Dispatch) => {
-    const db = firebaseClient.firestore();
-
-    const sceneDoc = await db
-      .collection("scenes")
-      .where("sceneId", "==", sceneId)
-      .get();
-    const [sceneRef] = sceneDoc.docs;
-
-    if (sceneRef) {
-      const scene = sceneRef.data() as UnresolvedScene;
-      if (scene) {
-        const needToLoadCasts = scene.casts.filter(
-          (cast: any) => !!cast.ref
-        ) as {
-          ref: { castId: string };
-        }[];
-        if (needToLoadCasts.length) {
-          logger.info(`Normalizing scene: ${sceneId}`);
-          // Normalize casts
-          const loadedCasts = await Promise.all(
-            needToLoadCasts.map(async ({ ref }) => {
-              const castDoc = await db
-                .collection("casts")
-                .where("castId", "==", Number(ref.castId))
-                .get();
-              return castDoc.docs[0].data();
-            })
-          );
-          const casts = scene.casts.map((cast) => {
-            if ((cast as { ref: { castId: string } }).ref) {
-              return loadedCasts.find(
-                ({ castId }: any) =>
-                  castId === (cast as { ref: { castId: string } }).ref.castId
-              );
-            }
-            return cast;
-          }) as Cast[];
-          scene.casts = casts;
-        }
-        // scene.casts = menuDecorator(scene.casts)
-        dispatch({
-          type: SCENE_LOAD_COMPLETE,
-          payload: scene,
-        });
-      }
-
-      return scene as Scene;
+    const scene = await serviceFetchScene(sceneId, firebaseClient.firestore());
+    if (scene) {
+      // scene.casts = menuDecorator(scene.casts)
+      dispatch({
+        type: SCENE_LOAD_COMPLETE,
+        payload: scene,
+      });
+      return scene;
     }
     return null;
   };
@@ -107,7 +69,7 @@ export const fetch: ActionCreator<
 export const fetchScene: ActionCreator<
   ThunkAction<Promise<Scene | null>, any, any, Action>
 > = (id: string) => {
-  logger.info("fetchScene", id);
+  logger.info('fetchScene', id);
   return async (dispatch) => {
     const sceneData = await dispatch(fetch(Number(id)));
     dispatch(sceneLoadComplete(sceneData));
@@ -180,7 +142,7 @@ export const runScene: ActionCreator<
   ThunkAction<Promise<void>, any, any, Action>
 > = (scene) => {
   return async (dispatch, getState) => {
-    logger.info("runScene", scene.sceneId);
+    logger.info('runScene', scene.sceneId);
     let userIncontrol = false;
     try {
       let currentScenes = sceneSelectors.currentScenesData(
@@ -211,7 +173,7 @@ export const runScene: ActionCreator<
       userIncontrol = true;
       events.emit(`sceneEnter:${scene.sceneId}`);
     } catch (error) {
-      logger.error("runScene error", {
+      logger.error('runScene error', {
         error,
       });
       // Make sure user has control anyways
@@ -242,7 +204,7 @@ export const goToScene: ActionCreator<
   ThunkAction<Promise<void>, any, any, Action>
 > = (id: string, dissolve: boolean) => {
   return (dispatch, getState) => {
-    logger.info("goToScene:queue", id);
+    logger.info('goToScene:queue', id);
     let currentSceneData = sceneSelectors.currentSceneData(getState());
     if (
       sceneLoadQueue.isPending(id) ||
@@ -258,13 +220,13 @@ export const goToScene: ActionCreator<
       id,
       tasks: [
         () => {
-          logger.info("goToScene:start", id);
+          logger.info('goToScene:start', id);
           currentSceneData = sceneSelectors.currentSceneData(getState());
 
           function doSceneTransition() {
             isTransitioning = true;
             logger.info(
-              "goToScene:exiting",
+              'goToScene:exiting',
               currentSceneData && currentSceneData.sceneId
             );
             dispatch({

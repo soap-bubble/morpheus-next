@@ -1,38 +1,42 @@
-import { useCallback, useEffect } from "react";
-import useThunkDispatch from "utils/useThunkDispatch";
+import { useCallback, useEffect } from 'react';
+import useThunkDispatch from 'utils/useThunkDispatch';
 import {
   selectors as inputSelectors,
   actions as inputActions,
-} from "morpheus/input";
-import { actions as castActions } from "morpheus/casts";
+} from 'morpheus/input';
+import { actions as castActions } from 'morpheus/casts';
 import {
   selectors as sceneSelectors,
   actions as sceneActions,
-} from "morpheus/scene";
+} from 'morpheus/scene';
 import {
   actions as gamestateActions,
   selectors as gamestateSelectors,
-} from "morpheus/gamestate";
+} from 'morpheus/gamestate';
 import {
   data as titleSceneData,
   actions as titleActions,
-} from "morpheus/title";
-import keycode from "keycode";
-import { actions as gameActions } from "morpheus/game";
-import useQueryParams from "hooks/useQueryParams";
-import { useSelector } from "react-redux";
+} from 'morpheus/title';
+import keycode from 'keycode';
+import { actions as gameActions } from 'morpheus/game';
+import useQueryParams from 'hooks/useQueryParams';
+import { useSelector } from 'react-redux';
 
 export default function useBootMorpheus() {
   const dispatch = useThunkDispatch();
   const qp = useQueryParams();
-
+  const resize = useCallback(
+    () =>
+      dispatch(
+        gameActions.resize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        })
+      ),
+    [dispatch]
+  );
   useEffect(() => {
-    dispatch(
-      gameActions.resize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      })
-    );
+    resize();
     dispatch(gameActions.setCursor(10000));
     dispatch(gamestateActions.fetchInitial()).then(() => {
       let savedGame;
@@ -68,11 +72,18 @@ export default function useBootMorpheus() {
     [dispatch]
   );
   useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("keyup", onKeyUp);
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("keyup", onKeyUp);
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keyup', onKeyUp);
     };
   }, [onKeyDown, onKeyUp]);
+
+  useEffect(() => {
+    window.addEventListener('resize', resize);
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, [resize]);
 }

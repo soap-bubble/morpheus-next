@@ -33,6 +33,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# building
+tsconfig.tsbuildinfo
+
 # Morpheus files
 morpheus.map.json
 public/GameDB

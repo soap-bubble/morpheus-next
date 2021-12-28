@@ -1,5 +1,5 @@
-import { Gamestates } from "morpheus/gamestate/isActive";
-import { ImageDrawable, VideoRef } from "./types";
+import { Gamestates } from 'morpheus/gamestate/isActive';
+import { ImageDrawable, VideoRef } from './types';
 import {
   MovieCast,
   Scene,
@@ -7,38 +7,37 @@ import {
   SupportedSoundCasts,
   MovieSpecialCast,
   ControlledMovieCast,
-} from "morpheus/casts/types";
-import { useMemo } from "react";
-import { or, and, Matcher } from "utils/matchers";
+} from 'morpheus/casts/types';
+import { useMemo } from 'react';
+import { or, and, Matcher } from 'utils/matchers';
 import {
   forMorpheusType,
   isAudio,
   isControlledCast,
   isImage,
   isMovie,
-} from "morpheus/casts/matchers";
-import { Renderable } from "morpheus/casts/components/Canvas";
+} from 'morpheus/casts/matchers';
+import { Renderable } from 'morpheus/casts/components/Canvas';
 import {
   matchActiveCast,
   generateRenderables,
   generateMovieCastDrawOps,
   generateControlledRenderables,
   generateMovieCastRenderables,
-} from "./transforms";
-import { flatten, uniqBy } from "lodash";
-import loggerFactory from "utils/logger";
-import { render } from "utils/render";
+} from './transforms';
+import { flatten, uniqBy } from 'lodash';
+import loggerFactory from 'utils/logger';
 
-const logger = loggerFactory("cast:hooks:useRenderables");
+const logger = loggerFactory('cast:hooks:useRenderables');
 function describeRenderables(renderables: Renderable[]) {
-  const describaleRenderables = renderables.filter(
+  const describableRenderables = renderables.filter(
     (r) => !!r.description
   ) as Required<Renderable>[];
   return (
-    describaleRenderables.length &&
-    describaleRenderables
+    describableRenderables.length &&
+    describableRenderables
       .map((r, index) => `${index}: ${r.description()}`)
-      .join("\n")
+      .join('\n')
   );
 }
 export default function useRenderables(
@@ -51,7 +50,7 @@ export default function useRenderables(
     left: number;
     top: number;
     image: CanvasImageSource | undefined;
-  },
+  } = { left: 0, top: 0, image: undefined },
   stageScenes: Scene[],
   enteringScene: Scene | undefined,
   exitingScene: Scene | undefined,
@@ -63,19 +62,19 @@ export default function useRenderables(
         or(
           and(
             or(
-              forMorpheusType("MovieSpecialCast"),
-              forMorpheusType("ControlledMovieCast")
+              forMorpheusType('MovieSpecialCast'),
+              forMorpheusType('ControlledMovieCast')
             ),
             (cast: Cast) => isAudio(cast as MovieCast)
           ),
-          forMorpheusType("SoundCast")
+          forMorpheusType('SoundCast')
         )
       ) as SupportedSoundCasts[];
     }
     return [];
   }, [stageScenes]);
   const cursorRenderable = useMemo<Renderable>(() => {
-    if (cursor.image) {
+    if (cursor?.image) {
       const image: CanvasImageSource = cursor.image;
       const screenPos = {
         x: cursor.left - (image.width as number) / 2,
@@ -100,13 +99,13 @@ export default function useRenderables(
       return renderable;
     }
     return () => {};
-  }, [cursor.image, cursor.left, cursor.top]);
+  }, [cursor?.image, cursor?.left, cursor?.top]);
   const [imageCasts, videoCasts, renderables] = useMemo<
     [MovieCast[], MovieSpecialCast[], Renderable[]]
   >((): [MovieCast[], MovieSpecialCast[], Renderable[]] => {
     const matchActive = matchActiveCast(gamestates);
     const matchSpecialMovies = and<MovieSpecialCast>(
-      forMorpheusType("MovieSpecialCast"),
+      forMorpheusType('MovieSpecialCast'),
       matchActive
     );
     const enteringActiveMovieCasts: MovieSpecialCast[] = enteringScene

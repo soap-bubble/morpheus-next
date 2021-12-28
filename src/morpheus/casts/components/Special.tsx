@@ -33,7 +33,7 @@ interface SpecialProps {
   onPointerLeave?: (e: PointerEvent<HTMLCanvasElement>) => void
   stageScenes: Scene[]
   setDoneObserver: (o: null | Observable<MovieCast>) => void
-  cursor: { top: number; left: number; image: HTMLImageElement | undefined }
+  cursor?: { top: number; left: number; image: HTMLImageElement | undefined }
   enteringScene?: Scene
   exitingScene?: Scene
   gamestates: Gamestates

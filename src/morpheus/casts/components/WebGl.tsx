@@ -4,38 +4,25 @@ import React, {
   useState,
   useEffect,
   FunctionComponent,
-  useCallback,
-} from "react";
-import { Dispatch } from "redux";
-import { cloneDeep, map } from "lodash";
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
+} from 'react';
+import { cloneDeep, map } from 'lodash';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import {
-  BufferAttribute,
-  CylinderBufferGeometry,
   TextureLoader,
   Mesh,
   ShaderMaterial,
-  PerspectiveCamera,
-  CanvasTexture,
   ShaderMaterialParameters,
-  Texture,
   Camera,
   Object3D,
-} from "three";
-import createCanvas from "utils/canvas";
-import panoShader from "../shader/panoChunk";
-import { isCastActive, Gamestates } from "morpheus/gamestate/isActive";
-import { VideoController } from "./Videos";
-import { getAssetUrl } from "service/gamedb";
-import useCastRefNoticer from "../hooks/useCastRefNoticer";
-import { Scene, PanoCast, MovieSpecialCast, Cast } from "../types";
-import { flatten } from "lodash";
-import usePanoChunk from "../hooks/panoChunk";
-import usePanoMomentum from "../hooks/panoMomentum";
-import { usePointerEvents } from "morpheus/hotspot/eventInterface";
-import { Matcher, forMorpheusType } from "../matchers";
-import { and } from "utils/matchers";
-import { PANO_OFFSET, PANO_CANVAS_WIDTH } from "../../constants";
+} from 'three';
+import panoShader from '../shader/panoChunk';
+import { isCastActive, Gamestates } from 'morpheus/gamestate/isActive';
+import { getAssetUrl } from 'service/gamedb';
+import { Scene, PanoCast, Cast } from '../types';
+import usePanoChunk from '../hooks/panoChunk';
+import { Matcher, forMorpheusType } from '../matchers';
+import { and } from 'utils/matchers';
+import { PANO_OFFSET, PANO_CANVAS_WIDTH } from '../../constants';
 
 enum SceneType {
   VIDEO,
@@ -69,13 +56,12 @@ const step = (num: number, max: number) => {
   return num;
 };
 interface GlStageProps {
-  dispatch: Dispatch;
   stageScenes: Scene[];
   enteringScene?: Scene;
   exitingScene?: Scene;
   gamestates: Gamestates;
-  setCamera: (c: Camera | undefined) => void;
-  setPanoObject: (o: Object3D | undefined) => void;
+  setCamera?: (c: Camera | undefined) => void;
+  setPanoObject?: (o: Object3D | undefined) => void;
   rotation: { x: number; y: number; offsetX: number };
   volume: number;
   top: number;
@@ -89,7 +75,6 @@ function matchActiveCast<T extends Cast>(gamestates: Gamestates): Matcher<T> {
 }
 
 const WebGlScene = ({
-  dispatch,
   width,
   volume,
   height,
@@ -99,14 +84,12 @@ const WebGlScene = ({
   gamestates,
   setCamera,
   setPanoObject,
-  enteringScene,
-  exitingScene,
   stageScenes,
 }: GlStageProps) => {
   const onStagePano: PanoCast | undefined = useMemo(() => {
     const matchActive = matchActiveCast(gamestates);
     const matchPanoCast = and<PanoCast>(
-      forMorpheusType("PanoCast"),
+      forMorpheusType('PanoCast'),
       matchActive
     );
 
@@ -121,7 +104,7 @@ const WebGlScene = ({
     return stageActivePanoCasts;
   }, [stageScenes, gamestates]);
   const meshRef = useRef<Mesh>();
-  const panoUrl = onStagePano && getAssetUrl(onStagePano.fileName, "png");
+  const panoUrl = onStagePano && getAssetUrl(onStagePano.fileName, 'png');
   const textureLoader = useMemo(() => new TextureLoader(), []);
   const [texImage, setTexImage] = useState<HTMLImageElement>();
   useEffect(() => {
@@ -142,46 +125,16 @@ const WebGlScene = ({
     if (camera) {
       camera.lookAt(0, 0, 1);
     }
-    setCamera(camera);
-  }, [camera]);
+    if (setCamera) {
+      setCamera(camera);
+    }
+  }, [camera, setCamera]);
   useEffect(() => {
-    setPanoObject(meshRef.current);
-  }, [meshRef.current]);
+    if (typeof setPanoObject === 'function') {
+      setPanoObject(meshRef.current);
+    }
+  }, [setPanoObject, meshRef.current]);
 
-  // const panoInput = usePanoInput(
-  //   dispatch,
-  //   meshRef.current,
-  //   camera,
-  //   (stageScenes.length && stageScenes[stageScenes.length - 1]) || undefined,
-  //   top,
-  //   left,
-  //   width,
-  //   height,
-  //   offsetX,
-  //   rotation.x
-  // )
-  // const momentumInput = usePanoMomentum(5, 100)
-  // const pointerEvents = usePointerEvents(
-  //   {
-  //     onPointerDown: panoInput.onPointerDown,
-  //     onPointerMove: panoInput.onPointerMove,
-  //     onPointerUp: panoInput.onPointerUp,
-  //   },
-  //   {
-  //     onPointerDown: momentumInput.onPointerDown,
-  //     onPointerMove: momentumInput.onPointerMove,
-  //     onPointerUp: momentumInput.onPointerUp,
-  //     onPointerOut: momentumInput.onPointerOut,
-  //     onPointerLeave: momentumInput.onPointerLeave,
-  //   }
-  // )
-  // const {
-  //   onPointerDown,
-  //   onPointerMove,
-  //   onPointerUp,
-  //   onPointerLeave,
-  // } = pointerEvents
-  // const { delta } = momentumInput
   useFrame(() => {
     if (ref.current) {
       const offset = rotation.x - rotation.offsetX;
@@ -232,7 +185,10 @@ const WebGl: FunctionComponent<GlStageProps> = (props) => (
       position: [0, 0, 0.09],
     }}
     style={{
-      cursor: "none",
+      cursor: 'none',
+      position: "absolute",
+      width: `${props.width}px`,
+      height: `${props.height}px`,
       left: `${props.left}px`,
       top: `${props.top}px`,
     }}
