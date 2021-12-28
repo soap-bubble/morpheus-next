@@ -1,8 +1,6 @@
-import { flow, partialRight, filter, entries, map } from "lodash";
-import cache from "./cache";
-// @ts-ignore
-import * as modules from "./modules";
-import { Scene } from "./types";
+import { flow, partialRight, filter, entries, map } from 'lodash';
+import cache from './cache';
+import { Scene } from './types';
 import {
   LOADING,
   ENTERING,
@@ -10,8 +8,7 @@ import {
   ON_STAGE,
   PRELOAD,
   UNLOADING,
-} from "./actionTypes";
-import { createSelector } from "reselect";
+} from './actionTypes';
 
 function allSceneIdsForStatus(status: string) {
   return flow(
@@ -44,29 +41,6 @@ export function forScene(scene: Scene) {
     isUnloading: forStatus(UNLOADING),
     isPreloading: forStatus(PRELOAD),
   };
-  const moduleNames = Object.keys(modules) as (keyof typeof modules)[];
-  const moduleSelectors = moduleNames.reduce((memo, name) => {
-    if (modules[name]?.selectors) {
-      memo[name] = modules[name].selectors;
-    }
-    return memo;
-  }, {} as { [key in keyof typeof modules]: any });
-  Object.defineProperties(
-    castSelectors,
-    moduleNames.reduce(
-      (memo, name) =>
-        moduleSelectors[name]
-          ? Object.assign(memo, {
-              [name]: {
-                get() {
-                  return moduleSelectors[name](scene);
-                },
-              },
-            })
-          : memo,
-      {}
-    )
-  );
 
   return castSelectors;
 }

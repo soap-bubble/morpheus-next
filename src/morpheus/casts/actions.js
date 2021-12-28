@@ -2,7 +2,6 @@ import { get } from "lodash";
 import memoize from "utils/memoize";
 import loggerFactory from "utils/logger";
 import cache from "./cache";
-import { selectors as sceneSelectors } from "morpheus/scene";
 import createWebGLRendererPool from "./webglPool";
 import { forScene as cacheForScene, preloadedSceneIds } from "./selectors";
 import {
@@ -16,7 +15,7 @@ import {
   UNLOADING,
   UNPRELOAD,
 } from "./actionTypes";
-import * as modules from "./modules";
+// import * as modules from "./modules";
 
 const logger = loggerFactory("cast:actions");
 
