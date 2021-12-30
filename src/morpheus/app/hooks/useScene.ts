@@ -1,6 +1,5 @@
 import { Scene } from 'morpheus/casts/types';
 import { useEffect, useState } from 'react';
-import { firebaseClient } from 'service/firebase';
 import { fetch } from 'service/scene';
 
 export default function useScene(usingSceneId: number | string) {
@@ -15,7 +14,7 @@ export default function useScene(usingSceneId: number | string) {
       }
     }
     try {
-      const scene = await fetch(sceneId, firebaseClient.firestore());
+      const scene = await fetch(sceneId);
       if (scene) {
         doIfNotCancelled(() => setScene(scene));
       } else {

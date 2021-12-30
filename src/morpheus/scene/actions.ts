@@ -53,7 +53,7 @@ export const fetch: ActionCreator<
   ThunkAction<Promise<Scene | null>, any, any, Action>
 > = (sceneId: number) => {
   return async (dispatch: Dispatch) => {
-    const scene = await serviceFetchScene(sceneId, firebaseClient.firestore());
+    const scene = await serviceFetchScene(sceneId);
     if (scene) {
       // scene.casts = menuDecorator(scene.casts)
       dispatch({

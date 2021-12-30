@@ -18,11 +18,13 @@ import {
 import panoShader from '../shader/panoChunk';
 import { isCastActive, Gamestates } from 'morpheus/gamestate/isActive';
 import { getAssetUrl } from 'service/gamedb';
-import { Scene, PanoCast, Cast } from '../types';
+import { Scene, PanoCast, Cast, PanoAnim } from '../types';
 import usePanoChunk from '../hooks/panoChunk';
 import { Matcher, forMorpheusType } from '../matchers';
 import { and } from 'utils/matchers';
 import { PANO_OFFSET, PANO_CANVAS_WIDTH } from '../../constants';
+import useCastRefNoticer, { CastRef } from '../hooks/useCastRefNoticer';
+import { VideoController } from './Videos';
 
 enum SceneType {
   VIDEO,
@@ -103,6 +105,7 @@ const WebGlScene = ({
 
     return stageActivePanoCasts;
   }, [stageScenes, gamestates]);
+
   const meshRef = useRef<Mesh>();
   const panoUrl = onStagePano && getAssetUrl(onStagePano.fileName, 'png');
   const textureLoader = useMemo(() => new TextureLoader(), []);
@@ -175,26 +178,34 @@ const WebGlScene = ({
   );
 };
 
-const WebGl: FunctionComponent<GlStageProps> = (props) => (
-  <Canvas
-    camera={{
-      fov: 51.75,
-      aspect: 640 / 420,
-      near: 0.01,
-      far: 1000,
-      position: [0, 0, 0.09],
-    }}
-    style={{
-      cursor: 'none',
-      position: "absolute",
-      width: `${props.width}px`,
-      height: `${props.height}px`,
-      left: `${props.left}px`,
-      top: `${props.top}px`,
-    }}
-  >
-    <WebGlScene {...props} />
-  </Canvas>
-);
+const WebGl: FunctionComponent<GlStageProps> = (props) => {
+  const { enteringScene, stageScenes } = props
+  const [availableVideos, onVideoCastRef] = useCastRefNoticer<
+    VideoController,
+    PanoAnim
+  >()
+
+  return (
+    <Canvas
+      camera={{
+        fov: 51.75,
+        aspect: 640 / 420,
+        near: 0.01,
+        far: 1000,
+        position: [0, 0, 0.09],
+      }}
+      style={{
+        cursor: 'none',
+        position: 'absolute',
+        width: `${props.width}px`,
+        height: `${props.height}px`,
+        left: `${props.left}px`,
+        top: `${props.top}px`,
+      }}
+    >
+      <WebGlScene {...props} />
+    </Canvas>
+  );
+};
 
 export default WebGl;
